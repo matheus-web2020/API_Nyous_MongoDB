@@ -5,6 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Nyous.API.NoSQL.Context;
+using Nyous.API.NoSQL.Interfaces.Repositories;
+using Nyous.API.NoSQL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +28,16 @@ namespace Nyous.API.NoSQL
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Pega informação do AppSettings
+            services.Configure<NyousDatabaseSettings>(
+                Configuration.GetSection(nameof(NyousDatabaseSettings)));
+
+            //Faz a Injeção de Dependência
+            services.AddSingleton<INyousDatabaseSettings>(
+                sp => sp.GetRequiredService<IOptions<NyousDatabaseSettings>>().Value);
+
+            services.AddSingleton<IEventoRepository, EventoRepository>();
+
             services.AddControllers();
         }
 
